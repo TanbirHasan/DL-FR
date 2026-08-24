@@ -1,0 +1,93 @@
+"use client";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  addShoppingListItem,
+  checkShoppingListItem,
+  completeShoppingList,
+  createShoppingList,
+  deleteShoppingList,
+  deleteShoppingListItem,
+  getShoppingLists,
+  uncheckShoppingListItem,
+  updateShoppingList,
+} from "@/lib/api/shopping-lists";
+import type { CompleteListPayload, CreateShoppingListPayload } from "@/lib/types";
+
+export const shoppingListsKey = ["shopping-lists"] as const;
+
+function invalidateShoppingListsAndExpenses(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: shoppingListsKey });
+  queryClient.invalidateQueries({ queryKey: ["expenses"] });
+}
+
+export function useShoppingLists() {
+  return useQuery({ queryKey: shoppingListsKey, queryFn: getShoppingLists });
+}
+
+export function useCreateShoppingList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateShoppingListPayload) => createShoppingList(payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useUpdateShoppingList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) => updateShoppingList(id, title),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useDeleteShoppingList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteShoppingList(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useAddShoppingListItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, itemId }: { listId: string; itemId: string }) =>
+      addShoppingListItem(listId, itemId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useDeleteShoppingListItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) => deleteShoppingListItem(itemId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useCheckShoppingListItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, price }: { itemId: string; price: number }) =>
+      checkShoppingListItem(itemId, price),
+    onSuccess: () => invalidateShoppingListsAndExpenses(queryClient),
+  });
+}
+
+export function useUncheckShoppingListItem() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (itemId: string) => uncheckShoppingListItem(itemId),
+    onSuccess: () => invalidateShoppingListsAndExpenses(queryClient),
+  });
+}
+
+export function useCompleteShoppingList() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ listId, payload }: { listId: string; payload: CompleteListPayload }) =>
+      completeShoppingList(listId, payload),
+    onSuccess: () => invalidateShoppingListsAndExpenses(queryClient),
+  });
+}
