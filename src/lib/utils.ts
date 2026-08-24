@@ -8,10 +8,11 @@ export function cn(...inputs: ClassValue[]) {
 export function formatCurrency(amount: string | number): string {
   const value = typeof amount === "string" ? parseFloat(amount) : amount;
   if (Number.isNaN(value)) return "—";
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+  const formatted = new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(value);
+  return `৳${formatted}`;
 }
 
 export function formatDate(date: string): string {

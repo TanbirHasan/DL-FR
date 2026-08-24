@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,10 +50,13 @@ export default function LoginPage() {
   return (
     <RequireGuest>
       <div className="flex min-h-screen items-center justify-center p-4">
-        <Card className="w-full max-w-sm">
+        <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Log in</CardTitle>
-            <CardDescription>Welcome back to your daily life dashboard.</CardDescription>
+            <div className="mb-2 flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sparkles className="size-5" />
+            </div>
+            <CardTitle className="text-2xl font-bold">Log in</CardTitle>
+            <CardDescription>Welcome back to your Daily Life dashboard.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -77,6 +81,7 @@ export default function LoginPage() {
               </div>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Logging in..." : "Log in"}
+                {!isSubmitting && <ArrowRight className="size-4" />}
               </Button>
             </form>
             <p className="mt-4 text-center text-sm text-muted-foreground">

@@ -21,7 +21,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UnitSelect } from "./unit-select";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreateItem, useDeleteItem, useItems } from "@/hooks/use-items";
 import { extractErrorMessage } from "@/lib/api/client";
@@ -30,6 +32,7 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
+  const [unit, setUnit] = useState("");
 
   const { data: categories } = useCategories();
   const { data: items, isLoading } = useItems();
@@ -40,8 +43,9 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
     const trimmed = name.trim();
     if (!trimmed || !categoryId) return;
     try {
-      await createItem.mutateAsync({ name: trimmed, categoryId });
+      await createItem.mutateAsync({ name: trimmed, categoryId, unit: unit || undefined });
       setName("");
+      setUnit("");
     } catch (err) {
       toast.error(extractErrorMessage(err, "Could not create item"));
     }
@@ -101,6 +105,13 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
           </div>
         )}
 
+        {categories && categories.length > 0 && (
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">Unit (optional)</Label>
+            <UnitSelect value={unit} onChange={setUnit} />
+          </div>
+        )}
+
         <div className="max-h-72 space-y-1 overflow-y-auto">
           {isLoading && (
             <>
@@ -121,6 +132,7 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
             >
               <div className="flex items-center gap-2">
                 <span>{item.name}</span>
+                {item.unit && <span className="text-xs text-muted-foreground">({item.unit})</span>}
                 <Badge variant="secondary">{item.category?.name}</Badge>
               </div>
               <Button

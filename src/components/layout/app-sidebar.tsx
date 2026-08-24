@@ -8,6 +8,10 @@ import {
   Receipt,
   ShoppingCart,
   BellRing,
+  HandCoins,
+  BookOpen,
+  FileArchive,
+  HeartPulse,
   LogOut,
 } from "lucide-react";
 import {
@@ -24,6 +28,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { NotificationToggle } from "./notification-toggle";
+import { ThemeToggle } from "./theme-toggle";
 import { useAuth } from "@/hooks/use-auth";
 import { initials } from "@/lib/utils";
 
@@ -32,6 +37,10 @@ const NAV_ITEMS = [
   { href: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { href: "/dashboard/shopping-lists", label: "Shopping Lists", icon: ShoppingCart },
   { href: "/dashboard/reminders", label: "Reminders", icon: BellRing },
+  { href: "/dashboard/debts", label: "Debts", icon: HandCoins },
+  { href: "/dashboard/journal", label: "Daily Journal", icon: BookOpen },
+  { href: "/dashboard/health", label: "Health", icon: HeartPulse },
+  { href: "/dashboard/documents", label: "Documents Vault", icon: FileArchive },
 ];
 
 export function AppSidebar() {
@@ -46,13 +55,13 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
-      <SidebarHeader className="px-3 py-3">
+    <Sidebar className="border-sidebar-border bg-sidebar">
+      <SidebarHeader className="px-3 py-4">
         <Link href="/dashboard" className="flex items-center gap-2 px-1">
-          <span className="flex size-7 items-center justify-center rounded-md bg-primary text-sm font-semibold text-primary-foreground">
+          <span className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sm font-bold text-sidebar-primary-foreground shadow-sm shadow-black/20">
             D
           </span>
-          <span className="text-base font-semibold">Daily Life</span>
+          <span className="text-base font-bold tracking-tight text-sidebar-foreground">Daily Life</span>
         </Link>
       </SidebarHeader>
       <SidebarContent>
@@ -81,9 +90,9 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <div className="flex items-center gap-2 rounded-md px-2 py-1.5">
+            <div className="flex items-center gap-2 rounded-lg bg-sidebar-accent/70 px-2 py-2">
               <Avatar className="size-7">
-                <AvatarFallback className="text-xs">
+                <AvatarFallback className="bg-sidebar-primary text-xs font-semibold text-sidebar-primary-foreground">
                   {user ? initials(user.name) : ""}
                 </AvatarFallback>
               </Avatar>
@@ -94,6 +103,7 @@ export function AppSidebar() {
             </div>
           </SidebarMenuItem>
           <NotificationToggle />
+          <ThemeToggle />
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Log out">
               <LogOut />

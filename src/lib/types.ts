@@ -34,6 +34,7 @@ export interface ExpenseSummary {
 export interface Item {
   id: string;
   name: string;
+  unit: string | null;
   userId: string;
   categoryId: string;
   category?: Category;
@@ -45,6 +46,8 @@ export interface ShoppingListItem {
   name: string;
   isChecked: boolean;
   price: string | null;
+  quantity: string | null;
+  unit: string | null;
   shoppingListId: string;
   itemId: string;
   categoryId: string;
@@ -123,9 +126,19 @@ export interface CreateShoppingListPayload {
 export interface CreateItemPayload {
   name: string;
   categoryId: string;
+  unit?: string;
 }
 
-export type UpdateItemPayload = Partial<CreateItemPayload>;
+export type UpdateItemPayload = Partial<CreateItemPayload> & { unit?: string | null };
+
+export interface AddShoppingListItemPayload {
+  itemId: string;
+  quantity?: number;
+}
+
+export interface UpdateItemQuantityPayload {
+  quantity: number | null;
+}
 
 export interface CompleteListPayload {
   items: { itemId: string; price: number }[];
@@ -182,3 +195,147 @@ export interface PushSubscriptionPayload {
     auth: string;
   };
 }
+
+export type DebtDirection = "LENT" | "BORROWED";
+
+export interface Debt {
+  id: string;
+  personName: string;
+  direction: DebtDirection;
+  amount: string;
+  note: string | null;
+  date: string;
+  isSettled: boolean;
+  settledAt: string | null;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDebtPayload {
+  personName: string;
+  direction: DebtDirection;
+  amount: number;
+  note?: string;
+  date: string;
+}
+
+export type UpdateDebtPayload = Partial<CreateDebtPayload> & { isSettled?: boolean };
+
+export interface DebtQuery {
+  settled?: boolean;
+  direction?: DebtDirection;
+}
+
+export interface DebtSummary {
+  totalOwedToMe: number;
+  totalIOwe: number;
+  net: number;
+  byPerson: { personName: string; net: number }[];
+}
+
+export type JournalMood = "GREAT" | "GOOD" | "OKAY" | "LOW" | "STRESSED";
+
+export interface JournalEntry {
+  id: string;
+  title: string;
+  content: string;
+  mood: JournalMood | null;
+  entryDate: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJournalEntryPayload {
+  title: string;
+  content: string;
+  mood?: JournalMood;
+  entryDate: string;
+}
+
+export type UpdateJournalEntryPayload = Partial<CreateJournalEntryPayload> & {
+  mood?: JournalMood | null;
+};
+
+export interface JournalQuery {
+  month?: number;
+  year?: number;
+}
+
+export type HealthReminderType = "MEDICINE" | "DOCTOR" | "WATER" | "EXERCISE" | "OTHER";
+export type HealthReminderFrequency = "ONCE" | "DAILY" | "WEEKLY" | "MONTHLY";
+
+export interface HealthReminder {
+  id: string;
+  title: string;
+  notes: string | null;
+  type: HealthReminderType;
+  frequency: HealthReminderFrequency;
+  dueAt: string;
+  notifyBefore: number;
+  isCompleted: boolean;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateHealthReminderPayload {
+  title: string;
+  notes?: string;
+  type: HealthReminderType;
+  frequency?: HealthReminderFrequency;
+  dueAt: string;
+  notifyBefore?: number;
+}
+
+export type UpdateHealthReminderPayload = Partial<CreateHealthReminderPayload> & {
+  isCompleted?: boolean;
+};
+
+export type DocumentType =
+  | "PASSPORT"
+  | "NID"
+  | "INSURANCE"
+  | "WARRANTY"
+  | "LICENSE"
+  | "CERTIFICATE"
+  | "OTHER";
+
+export interface DocumentRecord {
+  id: string;
+  title: string;
+  type: DocumentType;
+  identifier: string | null;
+  notes: string | null;
+  issuer: string | null;
+  issuedAt: string | null;
+  expiresAt: string | null;
+  reminderDate: string | null;
+  storageLocation: string | null;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateDocumentPayload {
+  title: string;
+  type: DocumentType;
+  identifier?: string;
+  notes?: string;
+  issuer?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  reminderDate?: string;
+  storageLocation?: string;
+}
+
+export type UpdateDocumentPayload = Partial<CreateDocumentPayload> & {
+  identifier?: string | null;
+  notes?: string | null;
+  issuer?: string | null;
+  issuedAt?: string | null;
+  expiresAt?: string | null;
+  reminderDate?: string | null;
+  storageLocation?: string | null;
+};

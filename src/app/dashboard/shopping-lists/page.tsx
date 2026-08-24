@@ -13,10 +13,10 @@ export default function ShoppingListsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border bg-card/80 p-5 shadow-sm shadow-slate-900/5">
         <div>
-          <h1 className="text-2xl font-semibold">Shopping Lists</h1>
-          <p className="text-muted-foreground">Keep track of what you need to buy.</p>
+          <h1 className="text-3xl font-bold">Shopping Lists</h1>
+          <p className="mt-1 text-muted-foreground">Plan purchases, check items off, and log spend from one place.</p>
         </div>
         <div className="flex items-center gap-2">
           <ItemCatalogDialog
@@ -47,7 +47,7 @@ export default function ShoppingListsPage() {
       )}
 
       {!isLoading && lists?.length === 0 && (
-        <div className="rounded-md border border-dashed p-10 text-center text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-dashed bg-card/70 p-10 text-center text-sm text-muted-foreground">
           No shopping lists yet. Create one to get started.
         </div>
       )}

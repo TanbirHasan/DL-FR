@@ -11,8 +11,14 @@ import {
   getShoppingLists,
   uncheckShoppingListItem,
   updateShoppingList,
+  updateShoppingListItemQuantity,
 } from "@/lib/api/shopping-lists";
-import type { CompleteListPayload, CreateShoppingListPayload } from "@/lib/types";
+import type {
+  AddShoppingListItemPayload,
+  CompleteListPayload,
+  CreateShoppingListPayload,
+  UpdateItemQuantityPayload,
+} from "@/lib/types";
 
 export const shoppingListsKey = ["shopping-lists"] as const;
 
@@ -52,8 +58,17 @@ export function useDeleteShoppingList() {
 export function useAddShoppingListItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ listId, itemId }: { listId: string; itemId: string }) =>
-      addShoppingListItem(listId, itemId),
+    mutationFn: ({ listId, payload }: { listId: string; payload: AddShoppingListItemPayload }) =>
+      addShoppingListItem(listId, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
+  });
+}
+
+export function useUpdateItemQuantity() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, payload }: { itemId: string; payload: UpdateItemQuantityPayload }) =>
+      updateShoppingListItemQuantity(itemId, payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: shoppingListsKey }),
   });
 }
