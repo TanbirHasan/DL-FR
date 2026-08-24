@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { NotificationToggle } from "./notification-toggle";
 import { useAuth } from "@/hooks/use-auth";
 import { initials } from "@/lib/utils";
 
@@ -92,6 +93,7 @@ export function AppSidebar() {
               </div>
             </div>
           </SidebarMenuItem>
+          <NotificationToggle />
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} tooltip="Log out">
               <LogOut />

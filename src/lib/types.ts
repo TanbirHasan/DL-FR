@@ -16,10 +16,10 @@ export interface Expense {
   amount: string;
   note: string | null;
   date: string;
-  isRecurring: boolean;
   userId: string;
   categoryId: string;
   category?: Category;
+  recurringExpenseId: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -105,7 +105,6 @@ export interface CreateExpensePayload {
   note?: string;
   date: string;
   categoryId: string;
-  isRecurring?: boolean;
 }
 
 export type UpdateExpensePayload = Partial<CreateExpensePayload>;
@@ -141,3 +140,45 @@ export interface CreateReminderPayload {
 }
 
 export type UpdateReminderPayload = Partial<CreateReminderPayload> & { isCompleted?: boolean };
+
+export type RecurrenceFrequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+
+export interface RecurringExpense {
+  id: string;
+  amount: string;
+  note: string | null;
+  categoryId: string;
+  category?: Category;
+  frequency: RecurrenceFrequency;
+  startDate: string;
+  nextRunDate: string;
+  endDate: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateRecurringExpensePayload {
+  amount: number;
+  note?: string;
+  categoryId: string;
+  frequency: RecurrenceFrequency;
+  startDate: string;
+  endDate?: string;
+}
+
+export interface UpdateRecurringExpensePayload {
+  amount?: number;
+  note?: string;
+  categoryId?: string;
+  endDate?: string | null;
+  isActive?: boolean;
+}
+
+export interface PushSubscriptionPayload {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}

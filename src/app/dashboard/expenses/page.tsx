@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Repeat } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CategoryManager } from "@/components/expenses/category-manager";
@@ -9,6 +9,7 @@ import { ExpenseFormDialog } from "@/components/expenses/expense-form-dialog";
 import { ExpenseSummaryCards } from "@/components/expenses/expense-summary-cards";
 import { ExpenseTable } from "@/components/expenses/expense-table";
 import { MonthPicker } from "@/components/expenses/month-picker";
+import { RecurringExpensesDialog } from "@/components/expenses/recurring-expenses-dialog";
 import { useExpenses, useExpenseSummary } from "@/hooks/use-expenses";
 
 export default function ExpensesPage() {
@@ -28,6 +29,14 @@ export default function ExpensesPage() {
         </div>
         <div className="flex items-center gap-2">
           <CategoryManager />
+          <RecurringExpensesDialog
+            trigger={
+              <Button variant="outline" size="sm">
+                <Repeat className="size-4" />
+                Recurring
+              </Button>
+            }
+          />
           <ExpenseFormDialog
             trigger={
               <Button size="sm">
