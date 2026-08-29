@@ -129,7 +129,7 @@ export interface CreateItemPayload {
   unit?: string;
 }
 
-export type UpdateItemPayload = Partial<CreateItemPayload> & { unit?: string | null };
+export type UpdateItemPayload = Omit<Partial<CreateItemPayload>, "unit"> & { unit?: string | null };
 
 export interface AddShoppingListItemPayload {
   itemId: string;

@@ -7,13 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -26,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { CheckoffControl } from "./checkoff-control";
 import { CompleteListDialog } from "./complete-list-dialog";
+import { ItemCombobox } from "./item-combobox";
 import { QuantityControl } from "./quantity-control";
 import { useItems } from "@/hooks/use-items";
 import { useAddShoppingListItem, useDeleteShoppingList, useDeleteShoppingListItem } from "@/hooks/use-shopping-lists";
@@ -152,24 +146,11 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
           ))}
         </div>
         <div className="flex gap-2 pt-1">
-          <Select value={selectedItemId} onValueChange={setSelectedItemId}>
-            <SelectTrigger className="h-8 flex-1">
-              <SelectValue placeholder="Add an item" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableItems?.length === 0 && (
-                <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                  No more catalog items to add
-                </div>
-              )}
-              {availableItems?.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.name}
-                  {item.unit ? ` (${item.unit})` : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ItemCombobox
+            items={availableItems ?? []}
+            value={selectedItemId}
+            onSelect={setSelectedItemId}
+          />
           {selectedItemId && (
             <Input
               type="number"
