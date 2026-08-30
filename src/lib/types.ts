@@ -134,14 +134,19 @@ export type UpdateItemPayload = Omit<Partial<CreateItemPayload>, "unit"> & { uni
 export interface AddShoppingListItemPayload {
   itemId: string;
   quantity?: number;
+  price?: number;
 }
 
 export interface UpdateItemQuantityPayload {
   quantity: number | null;
 }
 
+export interface UpdateItemPricePayload {
+  price: number | null;
+}
+
 export interface CompleteListPayload {
-  items: { itemId: string; price: number }[];
+  items: { itemId: string; price?: number }[];
 }
 
 export interface CreateReminderPayload {

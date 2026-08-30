@@ -11,12 +11,14 @@ import {
   getShoppingLists,
   uncheckShoppingListItem,
   updateShoppingList,
+  updateShoppingListItemPrice,
   updateShoppingListItemQuantity,
 } from "@/lib/api/shopping-lists";
 import type {
   AddShoppingListItemPayload,
   CompleteListPayload,
   CreateShoppingListPayload,
+  UpdateItemPricePayload,
   UpdateItemQuantityPayload,
 } from "@/lib/types";
 
@@ -73,6 +75,15 @@ export function useUpdateItemQuantity() {
   });
 }
 
+export function useUpdateItemPrice() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, payload }: { itemId: string; payload: UpdateItemPricePayload }) =>
+      updateShoppingListItemPrice(itemId, payload),
+    onSuccess: () => invalidateShoppingListsAndExpenses(queryClient),
+  });
+}
+
 export function useDeleteShoppingListItem() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -84,7 +95,7 @@ export function useDeleteShoppingListItem() {
 export function useCheckShoppingListItem() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ itemId, price }: { itemId: string; price: number }) =>
+    mutationFn: ({ itemId, price }: { itemId: string; price?: number }) =>
       checkShoppingListItem(itemId, price),
     onSuccess: () => invalidateShoppingListsAndExpenses(queryClient),
   });

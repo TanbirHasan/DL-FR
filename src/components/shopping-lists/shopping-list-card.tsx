@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ import {
 import { CheckoffControl } from "./checkoff-control";
 import { CompleteListDialog } from "./complete-list-dialog";
 import { ItemCombobox } from "./item-combobox";
+import { PriceControl } from "./price-control";
 import { QuantityControl } from "./quantity-control";
 import { useItems } from "@/hooks/use-items";
 import { useAddShoppingListItem, useDeleteShoppingList, useDeleteShoppingListItem } from "@/hooks/use-shopping-lists";
@@ -30,6 +31,7 @@ import type { ShoppingList } from "@/lib/types";
 export function ShoppingListCard({ list }: { list: ShoppingList }) {
   const [selectedItemId, setSelectedItemId] = useState<string>("");
   const [newItemQuantity, setNewItemQuantity] = useState("");
+  const [newItemPrice, setNewItemPrice] = useState("");
   const { data: catalogItems } = useItems();
   const addItem = useAddShoppingListItem();
   const deleteItem = useDeleteShoppingListItem();
@@ -50,10 +52,15 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
   const handleAddItem = async () => {
     if (!selectedItemId) return;
     const quantity = newItemQuantity ? parseFloat(newItemQuantity) : undefined;
+    const price = newItemPrice ? parseFloat(newItemPrice) : undefined;
     try {
-      await addItem.mutateAsync({ listId: list.id, payload: { itemId: selectedItemId, quantity } });
+      await addItem.mutateAsync({
+        listId: list.id,
+        payload: { itemId: selectedItemId, quantity, price },
+      });
       setSelectedItemId("");
       setNewItemQuantity("");
+      setNewItemPrice("");
     } catch (err) {
       toast.error(extractErrorMessage(err, "Could not add item"));
     }
@@ -130,10 +137,7 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
                 {item.name}
               </span>
               <QuantityControl item={item} />
-              {item.isChecked && item.price && (
-                <span className="text-xs text-muted-foreground">{formatCurrency(item.price)}</span>
-              )}
-              {item.isChecked && !item.price && <CheckCircle2 className="size-3.5 text-primary" />}
+              <PriceControl item={item} />
               <Button
                 variant="ghost"
                 size="icon"
@@ -152,14 +156,24 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
             onSelect={setSelectedItemId}
           />
           {selectedItemId && (
-            <Input
-              type="number"
-              step="0.01"
-              placeholder={selectedCatalogItem?.unit ? `Qty (${selectedCatalogItem.unit})` : "Qty"}
-              className="h-8 w-24"
-              value={newItemQuantity}
-              onChange={(e) => setNewItemQuantity(e.target.value)}
-            />
+            <>
+              <Input
+                type="number"
+                step="0.01"
+                placeholder={selectedCatalogItem?.unit ? `Qty (${selectedCatalogItem.unit})` : "Qty"}
+                className="h-8 w-20"
+                value={newItemQuantity}
+                onChange={(e) => setNewItemQuantity(e.target.value)}
+              />
+              <Input
+                type="number"
+                step="0.01"
+                placeholder="Price"
+                className="h-8 w-20"
+                value={newItemPrice}
+                onChange={(e) => setNewItemPrice(e.target.value)}
+              />
+            </>
           )}
           <Button size="icon" className="size-8 shrink-0" onClick={handleAddItem} disabled={!selectedItemId}>
             <Plus className="size-4" />

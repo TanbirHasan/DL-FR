@@ -5,6 +5,7 @@ import type {
   CreateShoppingListPayload,
   ShoppingList,
   ShoppingListItem,
+  UpdateItemPricePayload,
   UpdateItemQuantityPayload,
 } from "@/lib/types";
 
@@ -47,7 +48,15 @@ export async function updateShoppingListItemQuantity(
   return data;
 }
 
-export async function checkShoppingListItem(itemId: string, price: number) {
+export async function updateShoppingListItemPrice(itemId: string, payload: UpdateItemPricePayload) {
+  const { data } = await apiClient.patch<ShoppingListItem>(
+    `/shopping-lists/items/${itemId}/price`,
+    payload
+  );
+  return data;
+}
+
+export async function checkShoppingListItem(itemId: string, price?: number) {
   const { data } = await apiClient.post<ShoppingListItem>(`/shopping-lists/items/${itemId}/check`, {
     price,
   });

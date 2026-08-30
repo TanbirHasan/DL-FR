@@ -29,6 +29,16 @@ export function CheckoffControl({ item }: { item: ShoppingListItem }) {
   const checkItem = useCheckShoppingListItem();
   const uncheckItem = useUncheckShoppingListItem();
 
+  // A price was already set (at add-time or edited later) — check it off
+  // directly, no need to ask again.
+  const handleCheckDirectly = async () => {
+    try {
+      await checkItem.mutateAsync({ itemId: item.id });
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Could not check off item"));
+    }
+  };
+
   const handleConfirmCheck = async () => {
     const value = parseFloat(price);
     if (!value || value <= 0) {
@@ -62,8 +72,8 @@ export function CheckoffControl({ item }: { item: ShoppingListItem }) {
             <AlertDialogHeader>
               <AlertDialogTitle>Uncheck &quot;{item.name}&quot;?</AlertDialogTitle>
               <AlertDialogDescription>
-                This will also remove the {item.price ? formatCurrency(item.price) : ""} expense
-                entry created for it.
+                This will remove the {item.price ? formatCurrency(item.price) : ""} expense entry
+                created for it. The price stays saved, so re-checking it won&apos;t ask again.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -76,6 +86,12 @@ export function CheckoffControl({ item }: { item: ShoppingListItem }) {
     );
   }
 
+  // A price is already saved on this item — check it off with one click.
+  if (item.price) {
+    return <Checkbox checked={false} onCheckedChange={handleCheckDirectly} />;
+  }
+
+  // No price saved yet — ask for one before checking it off.
   return (
     <Popover open={priceOpen} onOpenChange={setPriceOpen}>
       <PopoverTrigger asChild>

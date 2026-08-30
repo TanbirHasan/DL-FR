@@ -26,6 +26,17 @@ export function CompleteListDialog({ list }: { list: ShoppingList }) {
 
   const uncheckedItems = list.items.filter((item) => !item.isChecked);
 
+  const openDialog = (next: boolean) => {
+    setOpen(next);
+    if (next) {
+      // Pre-fill with any price already saved on the item, so items added
+      // with a price don't need to be re-typed here.
+      setPrices(
+        Object.fromEntries(uncheckedItems.map((item) => [item.id, item.price ?? ""]))
+      );
+    }
+  };
+
   const handleSubmit = async () => {
     const entries = Object.entries(prices)
       .map(([itemId, value]) => ({ itemId, price: parseFloat(value) }))
@@ -49,7 +60,7 @@ export function CompleteListDialog({ list }: { list: ShoppingList }) {
   if (uncheckedItems.length === 0) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={openDialog}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <CheckCheck className="size-4" />
