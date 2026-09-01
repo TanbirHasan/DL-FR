@@ -41,6 +41,15 @@ const FREQUENCY_LABEL: Record<string, string> = {
   YEARLY: "Yearly",
 };
 
+const DAY_LABEL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const weekendSummary = (days: number[]) =>
+  [...days]
+    .sort((a, b) => a - b)
+    .map((d) => DAY_LABEL[d])
+    .filter(Boolean)
+    .join(", ");
+
 export function RecurringExpensesDialog({ trigger }: { trigger: React.ReactNode }) {
   const { data: recurringExpenses, isLoading } = useRecurringExpenses();
   const updateMutation = useUpdateRecurringExpense();
@@ -104,6 +113,9 @@ export function RecurringExpensesDialog({ trigger }: { trigger: React.ReactNode 
                     <span className="font-medium">{formatCurrency(item.amount)}</span>
                     <Badge variant="secondary">{item.category?.name}</Badge>
                     <Badge variant="outline">{FREQUENCY_LABEL[item.frequency]}</Badge>
+                    {item.frequency === "DAILY" && item.skipWeekends && (
+                      <Badge variant="outline">Skips {weekendSummary(item.weekendDays)}</Badge>
+                    )}
                   </div>
                   {item.note && <p className="text-sm text-muted-foreground">{item.note}</p>}
                   <p className="text-xs text-muted-foreground">

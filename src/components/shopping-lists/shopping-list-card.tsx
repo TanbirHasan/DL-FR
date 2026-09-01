@@ -49,6 +49,12 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
 
   const selectedCatalogItem = catalogItems?.find((i) => i.id === selectedItemId);
 
+  const parsedQty = newItemQuantity ? parseFloat(newItemQuantity) : NaN;
+  const derivedPrice =
+    selectedCatalogItem?.price && !Number.isNaN(parsedQty) && parsedQty > 0
+      ? Math.round(Number(selectedCatalogItem.price) * parsedQty * 100) / 100
+      : null;
+
   const handleAddItem = async () => {
     if (!selectedItemId) return;
     const quantity = newItemQuantity ? parseFloat(newItemQuantity) : undefined;
@@ -168,8 +174,8 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
               <Input
                 type="number"
                 step="0.01"
-                placeholder="Price"
-                className="h-8 w-20"
+                placeholder={derivedPrice != null ? `= ${formatCurrency(derivedPrice)}` : "Price"}
+                className="h-8 w-24"
                 value={newItemPrice}
                 onChange={(e) => setNewItemPrice(e.target.value)}
               />

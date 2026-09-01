@@ -24,15 +24,18 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UnitSelect } from "./unit-select";
+import { ItemPriceEditor } from "./item-price-editor";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreateItem, useDeleteItem, useItems } from "@/hooks/use-items";
 import { extractErrorMessage } from "@/lib/api/client";
+import { formatCurrency } from "@/lib/utils";
 
 export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [unit, setUnit] = useState("");
+  const [price, setPrice] = useState("");
 
   const { data: categories } = useCategories();
   const { data: items, isLoading } = useItems();
@@ -42,10 +45,21 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
   const handleAdd = async () => {
     const trimmed = name.trim();
     if (!trimmed || !categoryId) return;
+    const parsedPrice = price ? parseFloat(price) : undefined;
+    if (parsedPrice !== undefined && (Number.isNaN(parsedPrice) || parsedPrice <= 0)) {
+      toast.error("Enter a valid unit price");
+      return;
+    }
     try {
-      await createItem.mutateAsync({ name: trimmed, categoryId, unit: unit || undefined });
+      await createItem.mutateAsync({
+        name: trimmed,
+        categoryId,
+        unit: unit || undefined,
+        price: parsedPrice,
+      });
       setName("");
       setUnit("");
+      setPrice("");
     } catch (err) {
       toast.error(extractErrorMessage(err, "Could not create item"));
     }
@@ -106,9 +120,30 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
         )}
 
         {categories && categories.length > 0 && (
-          <div className="space-y-1.5">
-            <Label className="text-xs text-muted-foreground">Unit (optional)</Label>
-            <UnitSelect value={unit} onChange={setUnit} />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Unit (optional)</Label>
+              <UnitSelect value={unit} onChange={setUnit} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="item-unit-price" className="text-xs text-muted-foreground">
+                Unit price (optional)
+              </Label>
+              <Input
+                id="item-unit-price"
+                type="number"
+                step="0.01"
+                placeholder={unit ? `Price per ${unit}` : "Price per unit"}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleAdd();
+                  }
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -135,14 +170,26 @@ export function ItemCatalogDialog({ trigger }: { trigger: React.ReactNode }) {
                 {item.unit && <span className="text-xs text-muted-foreground">({item.unit})</span>}
                 <Badge variant="secondary">{item.category?.name}</Badge>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="size-6 text-muted-foreground hover:text-destructive"
-                onClick={() => handleDelete(item.id)}
-              >
-                <Trash2 className="size-3.5" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <ItemPriceEditor item={item}>
+                  <button
+                    type="button"
+                    className="rounded px-1.5 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-foreground"
+                  >
+                    {item.price
+                      ? `${formatCurrency(item.price)}${item.unit ? ` / ${item.unit}` : ""}`
+                      : "Set price"}
+                  </button>
+                </ItemPriceEditor>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-6 text-muted-foreground hover:text-destructive"
+                  onClick={() => handleDelete(item.id)}
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
             </div>
           ))}
         </div>

@@ -17,6 +17,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
@@ -41,6 +42,19 @@ const frequencyOptions = [
   { value: "YEARLY", label: "Yearly" },
 ] as const;
 
+// 0 = Sunday … 6 = Saturday, matching JS Date.getDay().
+const WEEKDAYS = [
+  { value: 0, label: "Sun" },
+  { value: 1, label: "Mon" },
+  { value: 2, label: "Tue" },
+  { value: 3, label: "Wed" },
+  { value: 4, label: "Thu" },
+  { value: 5, label: "Fri" },
+  { value: 6, label: "Sat" },
+] as const;
+
+const DEFAULT_WEEKEND_DAYS = [5, 6];
+
 const formSchema = z.object({
   amount: z.coerce.number().positive("Amount must be greater than 0"),
   categoryId: z.string().min(1, "Select a category"),
@@ -48,7 +62,12 @@ const formSchema = z.object({
   startDate: z.date(),
   endDate: z.date().optional(),
   note: z.string().max(200).optional(),
-});
+  includeWeekends: z.boolean(),
+  weekendDays: z.array(z.number().int().min(0).max(6)),
+}).refine(
+  (v) => v.frequency !== "DAILY" || v.includeWeekends || v.weekendDays.length > 0,
+  { path: ["weekendDays"], message: "Pick at least one weekend day" }
+);
 
 type FormValues = z.infer<typeof formSchema>;
 
@@ -65,38 +84,48 @@ export function RecurringExpenseFormDialog({
   const updateMutation = useUpdateRecurringExpense();
   const isEdit = Boolean(recurringExpense);
 
+  const buildDefaults = (): FormValues => ({
+    amount: recurringExpense ? Number(recurringExpense.amount) : (undefined as unknown as number),
+    categoryId: recurringExpense?.categoryId ?? "",
+    frequency: recurringExpense?.frequency ?? "MONTHLY",
+    startDate: recurringExpense ? new Date(recurringExpense.startDate) : new Date(),
+    endDate: recurringExpense?.endDate ? new Date(recurringExpense.endDate) : undefined,
+    note: recurringExpense?.note ?? "",
+    includeWeekends: recurringExpense ? !recurringExpense.skipWeekends : false,
+    weekendDays: recurringExpense?.weekendDays?.length
+      ? recurringExpense.weekendDays
+      : DEFAULT_WEEKEND_DAYS,
+  });
+
   const {
     control,
     register,
+    watch,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      amount: recurringExpense ? Number(recurringExpense.amount) : undefined,
-      categoryId: recurringExpense?.categoryId,
-      frequency: recurringExpense?.frequency ?? "MONTHLY",
-      startDate: recurringExpense ? new Date(recurringExpense.startDate) : new Date(),
-      endDate: recurringExpense?.endDate ? new Date(recurringExpense.endDate) : undefined,
-      note: recurringExpense?.note ?? "",
-    },
+    defaultValues: buildDefaults(),
   });
 
   useEffect(() => {
     if (open) {
-      reset({
-        amount: recurringExpense ? Number(recurringExpense.amount) : undefined,
-        categoryId: recurringExpense?.categoryId,
-        frequency: recurringExpense?.frequency ?? "MONTHLY",
-        startDate: recurringExpense ? new Date(recurringExpense.startDate) : new Date(),
-        endDate: recurringExpense?.endDate ? new Date(recurringExpense.endDate) : undefined,
-        note: recurringExpense?.note ?? "",
-      });
+      reset(buildDefaults());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, recurringExpense, reset]);
 
+  const frequency = watch("frequency");
+  const includeWeekends = watch("includeWeekends");
+  const showWeekendControls = frequency === "DAILY";
+
   const onSubmit = async (values: FormValues) => {
+    // Weekend skipping only applies to daily recurrence.
+    const weekendFields =
+      values.frequency === "DAILY"
+        ? { skipWeekends: !values.includeWeekends, weekendDays: values.weekendDays }
+        : {};
     try {
       if (isEdit && recurringExpense) {
         await updateMutation.mutateAsync({
@@ -106,6 +135,7 @@ export function RecurringExpenseFormDialog({
             categoryId: values.categoryId,
             endDate: values.endDate ? values.endDate.toISOString() : null,
             note: values.note || undefined,
+            ...weekendFields,
           },
         });
         toast.success("Recurring expense updated");
@@ -117,6 +147,7 @@ export function RecurringExpenseFormDialog({
           startDate: values.startDate.toISOString(),
           endDate: values.endDate ? values.endDate.toISOString() : undefined,
           note: values.note || undefined,
+          ...weekendFields,
         });
         toast.success("Recurring expense created");
       }
@@ -228,6 +259,71 @@ export function RecurringExpenseFormDialog({
               />
             </div>
           </div>
+
+          {showWeekendControls && (
+            <div className="space-y-3 rounded-md border p-3">
+              <Controller
+                control={control}
+                name="includeWeekends"
+                render={({ field }) => (
+                  <label className="flex items-start gap-2.5">
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(checked === true)}
+                      className="mt-0.5"
+                    />
+                    <span className="space-y-0.5">
+                      <span className="block text-sm font-medium">Include weekends</span>
+                      <span className="block text-xs text-muted-foreground">
+                        On: logs every day. Off: skips the weekend days selected below (e.g. a
+                        5-day office commute).
+                      </span>
+                    </span>
+                  </label>
+                )}
+              />
+
+              {!includeWeekends && (
+                <Controller
+                  control={control}
+                  name="weekendDays"
+                  render={({ field }) => (
+                    <div className="space-y-1.5">
+                      <Label className="text-xs">Weekend days (skipped)</Label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {WEEKDAYS.map((day) => {
+                          const selected = field.value.includes(day.value);
+                          return (
+                            <Button
+                              key={day.value}
+                              type="button"
+                              size="sm"
+                              variant={selected ? "default" : "outline"}
+                              className="h-8 w-12 px-0 text-xs"
+                              onClick={() =>
+                                field.onChange(
+                                  selected
+                                    ? field.value.filter((d) => d !== day.value)
+                                    : [...field.value, day.value].sort((a, b) => a - b)
+                                )
+                              }
+                            >
+                              {day.label}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                      {field.value.length === 0 && (
+                        <p className="text-xs text-destructive">
+                          Pick at least one day, or turn on “Include weekends”.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                />
+              )}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label>End date (optional)</Label>

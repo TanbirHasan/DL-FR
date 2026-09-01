@@ -35,6 +35,8 @@ export interface Item {
   id: string;
   name: string;
   unit: string | null;
+  /** Optional catalog unit price; drives auto-fill of list-item prices. */
+  price: string | null;
   userId: string;
   categoryId: string;
   category?: Category;
@@ -127,9 +129,13 @@ export interface CreateItemPayload {
   name: string;
   categoryId: string;
   unit?: string;
+  price?: number;
 }
 
-export type UpdateItemPayload = Omit<Partial<CreateItemPayload>, "unit"> & { unit?: string | null };
+export type UpdateItemPayload = Omit<Partial<CreateItemPayload>, "unit" | "price"> & {
+  unit?: string | null;
+  price?: number | null;
+};
 
 export interface AddShoppingListItemPayload {
   itemId: string;
@@ -172,6 +178,10 @@ export interface RecurringExpense {
   nextRunDate: string;
   endDate: string | null;
   isActive: boolean;
+  /** DAILY-only: skip occurrences that land on a day in weekendDays. */
+  skipWeekends: boolean;
+  /** Weekday numbers treated as weekend, 0 = Sunday … 6 = Saturday. */
+  weekendDays: number[];
   createdAt: string;
   updatedAt: string;
 }
@@ -183,6 +193,8 @@ export interface CreateRecurringExpensePayload {
   frequency: RecurrenceFrequency;
   startDate: string;
   endDate?: string;
+  skipWeekends?: boolean;
+  weekendDays?: number[];
 }
 
 export interface UpdateRecurringExpensePayload {
@@ -191,6 +203,8 @@ export interface UpdateRecurringExpensePayload {
   categoryId?: string;
   endDate?: string | null;
   isActive?: boolean;
+  skipWeekends?: boolean;
+  weekendDays?: number[];
 }
 
 export interface PushSubscriptionPayload {
