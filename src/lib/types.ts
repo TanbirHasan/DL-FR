@@ -349,6 +349,47 @@ export interface CreateDocumentPayload {
   storageLocation?: string;
 }
 
+export type JobApplicationStatus = "APPLIED" | "ASSESSMENT" | "INTERVIEW" | "OFFER" | "REJECTED";
+
+export interface JobApplication {
+  id: string;
+  companyName: string;
+  role: string;
+  jobUrl: string | null;
+  /** Raw pasted job post — requirements, responsibilities, etc. */
+  description: string | null;
+  status: JobApplicationStatus;
+  appliedDate: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateJobApplicationPayload {
+  companyName: string;
+  role: string;
+  jobUrl?: string;
+  description?: string;
+  status?: JobApplicationStatus;
+  appliedDate?: string;
+}
+
+export type UpdateJobApplicationPayload = Partial<
+  Omit<CreateJobApplicationPayload, "jobUrl" | "description">
+> & {
+  jobUrl?: string | null;
+  description?: string | null;
+};
+
+export interface JobApplicationQuery {
+  status?: JobApplicationStatus;
+}
+
+export interface JobApplicationSummary {
+  total: number;
+  byStatus: Record<JobApplicationStatus, number>;
+}
+
 export type UpdateDocumentPayload = Partial<CreateDocumentPayload> & {
   identifier?: string | null;
   notes?: string | null;

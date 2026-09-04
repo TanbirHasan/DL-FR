@@ -12,6 +12,7 @@ import {
   BookOpen,
   FileArchive,
   HeartPulse,
+  Briefcase,
   LogOut,
 } from "lucide-react";
 import {
@@ -41,6 +42,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/journal", label: "Daily Journal", icon: BookOpen },
   { href: "/dashboard/health", label: "Health", icon: HeartPulse },
   { href: "/dashboard/documents", label: "Documents Vault", icon: FileArchive },
+  { href: "/dashboard/job-applications", label: "Job Applications", icon: Briefcase },
 ];
 
 export function AppSidebar() {
