@@ -85,13 +85,50 @@ export interface ApiErrorBody {
   message: string;
 }
 
+export interface Income {
+  id: string;
+  amount: string;
+  source: string;
+  note: string | null;
+  date: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateIncomePayload {
+  amount: number;
+  source: string;
+  note?: string;
+  date: string;
+}
+
+export type UpdateIncomePayload = Partial<CreateIncomePayload>;
+
+export interface IncomeQuery {
+  month?: number;
+  year?: number;
+}
+
+export interface IncomeSummary {
+  year: number;
+  month: number;
+  total: number;
+  count: number;
+  bySource: { source: string; total: number; count: number }[];
+}
+
 export interface AssistantMonthTotals {
   year: number;
   month: number;
   label: string;
+  /** Expense total. */
   total: number;
   count: number;
   byCategory: { categoryName: string; total: number; count: number }[];
+  income: number;
+  net: number;
+  savingsRatePercent: number | null;
 }
 
 export interface AssistantContext {
@@ -100,11 +137,25 @@ export interface AssistantContext {
   thisMonth: AssistantMonthTotals;
   prevMonth: AssistantMonthTotals;
   monthOverMonth: { changeAmount: number; changePercent: number | null };
-  trend: { year: number; month: number; label: string; total: number }[];
+  incomeMonthOverMonth: { changeAmount: number; changePercent: number | null };
+  trend: {
+    year: number;
+    month: number;
+    label: string;
+    total: number;
+    income: number;
+    net: number;
+  }[];
   averageMonthlyTotal: number;
+  averageMonthlyIncome: number;
+  averageMonthlyNet: number;
   topCategoryThisMonth: { categoryName: string; total: number; count: number } | null;
   biggestExpenseThisMonth: { amount: number; categoryName: string; date: string } | null;
+  topIncomeSourceThisMonth: { source: string; total: number; count: number } | null;
 }
+
+/** The `/insights` endpoint returns the same shape the assistant uses internally. */
+export type InsightsBundle = AssistantContext;
 
 export interface AssistantQuery {
   question: string;

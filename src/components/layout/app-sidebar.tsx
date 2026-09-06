@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   LayoutDashboard,
   Receipt,
+  Banknote,
   ShoppingCart,
   BellRing,
   HandCoins,
@@ -36,6 +37,7 @@ import { initials } from "@/lib/utils";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/expenses", label: "Expenses", icon: Receipt },
+  { href: "/dashboard/income", label: "Income", icon: Banknote },
   { href: "/dashboard/shopping-lists", label: "Shopping Lists", icon: ShoppingCart },
   { href: "/dashboard/reminders", label: "Reminders", icon: BellRing },
   { href: "/dashboard/debts", label: "Debts", icon: HandCoins },

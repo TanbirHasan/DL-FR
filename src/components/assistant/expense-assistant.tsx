@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   ChevronLeft,
   ChevronRight,
+  PiggyBank,
   Send,
   Sparkles,
   Square,
@@ -103,6 +104,20 @@ function NumbersStrip({ context }: { context: AssistantContext }) {
           {up ? <TrendingUp className="size-3" /> : <TrendingDown className="size-3" />}
           {up ? "+" : "−"}
           {formatCurrency(Math.abs(delta))}
+        </span>
+      )}
+      {context.thisMonth.income > 0 && (
+        <span
+          className={cn(
+            chip,
+            context.thisMonth.net >= 0
+              ? "text-emerald-600 dark:text-emerald-400"
+              : "text-destructive",
+          )}
+        >
+          <PiggyBank className="size-3" />
+          Net {context.thisMonth.net >= 0 ? "+" : "−"}
+          {formatCurrency(Math.abs(context.thisMonth.net))}
         </span>
       )}
       {topCategoryThisMonth && (

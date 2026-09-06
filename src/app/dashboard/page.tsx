@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { NetSavingsCards } from "@/components/dashboard/net-savings-cards";
 import { useAuth } from "@/hooks/use-auth";
 import { useExpenseSummary } from "@/hooks/use-expenses";
 import { useReminders } from "@/hooks/use-reminders";
@@ -53,6 +54,8 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      <NetSavingsCards year={now.getFullYear()} month={now.getMonth() + 1} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Card className="relative">
