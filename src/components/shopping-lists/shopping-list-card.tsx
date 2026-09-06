@@ -43,8 +43,14 @@ export function ShoppingListCard({ list }: { list: ShoppingList }) {
     .reduce((sum, item) => sum + Number(item.price), 0);
   const progress = list.items.length > 0 ? (checkedCount / list.items.length) * 100 : 0;
 
+  // Hide a catalog item only while it has an unchecked line on this list. Once it
+  // has been bought (checked off), it becomes available again so the same item
+  // can be purchased on a later trip without disturbing the earlier expense.
+  const pendingItemIds = new Set(
+    list.items.filter((li) => !li.isChecked).map((li) => li.itemId)
+  );
   const availableItems = catalogItems?.filter(
-    (catalogItem) => !list.items.some((li) => li.itemId === catalogItem.id)
+    (catalogItem) => !pendingItemIds.has(catalogItem.id)
   );
 
   const selectedCatalogItem = catalogItems?.find((i) => i.id === selectedItemId);

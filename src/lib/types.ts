@@ -118,6 +118,9 @@ export interface ExpenseQuery {
   month?: number;
   year?: number;
   categoryId?: string;
+  search?: string;
+  minAmount?: number;
+  maxAmount?: number;
 }
 
 export interface CreateShoppingListPayload {
