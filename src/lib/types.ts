@@ -85,6 +85,38 @@ export interface ApiErrorBody {
   message: string;
 }
 
+export interface AssistantMonthTotals {
+  year: number;
+  month: number;
+  label: string;
+  total: number;
+  count: number;
+  byCategory: { categoryName: string; total: number; count: number }[];
+}
+
+export interface AssistantContext {
+  currency: string;
+  currencySymbol: string;
+  thisMonth: AssistantMonthTotals;
+  prevMonth: AssistantMonthTotals;
+  monthOverMonth: { changeAmount: number; changePercent: number | null };
+  trend: { year: number; month: number; label: string; total: number }[];
+  averageMonthlyTotal: number;
+  topCategoryThisMonth: { categoryName: string; total: number; count: number } | null;
+  biggestExpenseThisMonth: { amount: number; categoryName: string; date: string } | null;
+}
+
+export interface AssistantQuery {
+  question: string;
+  month: number;
+  year: number;
+}
+
+export interface AssistantAnswer {
+  answer: string;
+  context: AssistantContext;
+}
+
 export interface AuthResponse {
   user: User;
   accessToken: string;

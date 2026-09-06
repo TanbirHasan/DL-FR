@@ -4,6 +4,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Separator } from "@/components/ui/separator";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { RequireAuth } from "@/components/guards/require-auth";
+import { ExpenseAssistant } from "@/components/assistant/expense-assistant";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,6 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {children}
           </main>
         </SidebarInset>
+        <ExpenseAssistant />
       </SidebarProvider>
     </RequireAuth>
   );
