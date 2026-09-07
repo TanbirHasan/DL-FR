@@ -435,7 +435,13 @@ export interface CreateDocumentPayload {
   storageLocation?: string;
 }
 
-export type JobApplicationStatus = "APPLIED" | "ASSESSMENT" | "INTERVIEW" | "OFFER" | "REJECTED";
+export type JobApplicationStatus =
+  | "NOT_APPLIED"
+  | "APPLIED"
+  | "ASSESSMENT"
+  | "INTERVIEW"
+  | "OFFER"
+  | "REJECTED";
 
 export interface JobApplication {
   id: string;
@@ -446,6 +452,8 @@ export interface JobApplication {
   description: string | null;
   status: JobApplicationStatus;
   appliedDate: string;
+  /** Application deadline; null means N/A. */
+  deadline: string | null;
   userId: string;
   createdAt: string;
   updatedAt: string;
@@ -458,6 +466,7 @@ export interface CreateJobApplicationPayload {
   description?: string;
   status?: JobApplicationStatus;
   appliedDate?: string;
+  deadline?: string | null;
 }
 
 export type UpdateJobApplicationPayload = Partial<

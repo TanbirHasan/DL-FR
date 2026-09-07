@@ -1,6 +1,7 @@
 import type { JobApplicationStatus } from "@/lib/types";
 
 export const STATUS_ORDER: JobApplicationStatus[] = [
+  "NOT_APPLIED",
   "APPLIED",
   "ASSESSMENT",
   "INTERVIEW",
@@ -9,6 +10,7 @@ export const STATUS_ORDER: JobApplicationStatus[] = [
 ];
 
 export const STATUS_LABEL: Record<JobApplicationStatus, string> = {
+  NOT_APPLIED: "Not applied",
   APPLIED: "Applied",
   ASSESSMENT: "OA / Task",
   INTERVIEW: "Interview",
@@ -17,6 +19,8 @@ export const STATUS_LABEL: Record<JobApplicationStatus, string> = {
 };
 
 export const STATUS_BADGE_CLASS: Record<JobApplicationStatus, string> = {
+  NOT_APPLIED:
+    "border-dashed border-zinc-300 text-zinc-500 dark:border-zinc-600 dark:text-zinc-400",
   APPLIED: "border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-300",
   ASSESSMENT: "border-amber-200 text-amber-700 dark:border-amber-800 dark:text-amber-400",
   INTERVIEW: "border-indigo-200 text-indigo-700 dark:border-indigo-800 dark:text-indigo-400",

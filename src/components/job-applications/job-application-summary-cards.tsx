@@ -13,7 +13,7 @@ export function JobApplicationSummaryCards({
   isLoading: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
       {STATUS_ORDER.map((status) => (
         <Card key={status}>
           <CardHeader className="pb-1">

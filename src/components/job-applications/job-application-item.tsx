@@ -73,7 +73,25 @@ export function JobApplicationItem({ jobApplication }: { jobApplication: JobAppl
               </a>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">Applied {formatDate(jobApplication.appliedDate)}</p>
+          <p className="text-xs text-muted-foreground">
+            {jobApplication.status === "NOT_APPLIED" ? "Saved" : "Applied"}{" "}
+            {formatDate(jobApplication.appliedDate)}
+            {jobApplication.deadline && (
+              <>
+                {" · "}
+                <span
+                  className={cn(
+                    new Date(jobApplication.deadline) < new Date() &&
+                      jobApplication.status === "NOT_APPLIED"
+                      ? "font-medium text-destructive"
+                      : undefined,
+                  )}
+                >
+                  Deadline {formatDate(jobApplication.deadline)}
+                </span>
+              </>
+            )}
+          </p>
           {jobApplication.description && (
             <div>
               <button

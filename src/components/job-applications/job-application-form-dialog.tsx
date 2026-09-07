@@ -40,7 +40,8 @@ const formSchema = z.object({
   role: z.string().min(1, "Role is required").max(150),
   jobUrl: z.union([z.url("Enter a valid URL"), z.literal("")]).optional(),
   appliedDate: z.date(),
-  status: z.enum(["APPLIED", "ASSESSMENT", "INTERVIEW", "OFFER", "REJECTED"]),
+  deadline: z.date().nullable(),
+  status: z.enum(["NOT_APPLIED", "APPLIED", "ASSESSMENT", "INTERVIEW", "OFFER", "REJECTED"]),
   description: z.string().max(10000).optional(),
 });
 
@@ -63,6 +64,7 @@ export function JobApplicationFormDialog({
     role: jobApplication?.role ?? "",
     jobUrl: jobApplication?.jobUrl ?? "",
     appliedDate: jobApplication ? new Date(jobApplication.appliedDate) : new Date(),
+    deadline: jobApplication?.deadline ? new Date(jobApplication.deadline) : null,
     status: jobApplication?.status ?? "APPLIED",
     description: jobApplication?.description ?? "",
   });
@@ -90,6 +92,7 @@ export function JobApplicationFormDialog({
         role: values.role,
         jobUrl: values.jobUrl || undefined,
         appliedDate: values.appliedDate.toISOString(),
+        deadline: values.deadline ? values.deadline.toISOString() : null,
         status: values.status,
         description: values.description || undefined,
       };
@@ -111,15 +114,16 @@ export function JobApplicationFormDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
+      <DialogContent className="flex max-h-[calc(100dvh-2rem)] flex-col sm:max-w-lg">
+        <DialogHeader className="shrink-0">
           <DialogTitle>{isEdit ? "Edit job application" : "Log a job application"}</DialogTitle>
           <DialogDescription>
             Paste the job post below — company, role, and stage are quick top-line fields so the
             list stays scannable.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="-mx-1 flex-1 space-y-4 overflow-y-auto px-1">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="companyName">Company</Label>
@@ -158,7 +162,7 @@ export function JobApplicationFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Applied on</Label>
+              <Label>Date</Label>
               <Controller
                 control={control}
                 name="appliedDate"
@@ -191,6 +195,49 @@ export function JobApplicationFormDialog({
           </div>
 
           <div className="space-y-2">
+            <Label>Deadline (optional)</Label>
+            <Controller
+              control={control}
+              name="deadline"
+              render={({ field }) => (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="size-4" />
+                      {field.value ? format(field.value, "PPP") : "N/A — no deadline"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ?? undefined}
+                      onSelect={(date) => date && field.onChange(date)}
+                    />
+                    <div className="border-t p-2">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="w-full text-muted-foreground"
+                        onClick={() => field.onChange(null)}
+                      >
+                        Set to N/A
+                      </Button>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+            />
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="jobUrl">Job link (optional)</Label>
             <Input
               id="jobUrl"
@@ -205,12 +252,13 @@ export function JobApplicationFormDialog({
             <Textarea
               id="description"
               placeholder="Paste the requirements, responsibilities, description..."
-              className="min-h-32"
+              className="min-h-32 max-h-[38vh] overflow-y-auto"
               {...register("description")}
             />
           </div>
+          </div>
 
-          <DialogFooter>
+          <DialogFooter className="shrink-0">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Saving..." : isEdit ? "Save changes" : "Save"}
             </Button>
