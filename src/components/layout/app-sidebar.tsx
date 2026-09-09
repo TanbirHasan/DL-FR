@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   LayoutDashboard,
+  CalendarDays,
   Receipt,
   Banknote,
   CalendarClock,
@@ -37,6 +38,7 @@ import { initials } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/agenda", label: "Upcoming", icon: CalendarDays },
   { href: "/dashboard/expenses", label: "Expenses", icon: Receipt },
   { href: "/dashboard/income", label: "Income", icon: Banknote },
   { href: "/dashboard/bills", label: "Bills to Pay", icon: CalendarClock },

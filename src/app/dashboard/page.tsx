@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { BellRing, BookOpen, CalendarClock, FileArchive, HeartPulse, Receipt, ShoppingCart, TrendingUp } from "lucide-react";
+import { BellRing, BookOpen, CalendarClock, CalendarDays, FileArchive, HeartPulse, Receipt, ShoppingCart, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { NetSavingsCards } from "@/components/dashboard/net-savings-cards";
+import { UpcomingAgenda } from "@/components/dashboard/upcoming-agenda";
 import { useAuth } from "@/hooks/use-auth";
 import { useExpenseSummary } from "@/hooks/use-expenses";
 import { useBillSummary } from "@/hooks/use-bills";
+import { useAgenda } from "@/hooks/use-agenda";
 import { useReminders } from "@/hooks/use-reminders";
 import { useShoppingLists } from "@/hooks/use-shopping-lists";
 import { useDocuments } from "@/hooks/use-documents";
@@ -33,6 +35,7 @@ export default function DashboardPage() {
     now.getFullYear(),
     now.getMonth() + 1
   );
+  const { data: agenda, isLoading: agendaLoading } = useAgenda(7);
 
   const upcomingReminders = reminders?.slice(0, 4) ?? [];
   const activeListsCount = lists?.length ?? 0;
@@ -61,6 +64,35 @@ export default function DashboardPage() {
       </div>
 
       <NetSavingsCards year={now.getFullYear()} month={now.getMonth() + 1} />
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="size-4 text-primary" />
+            <CardTitle className="text-base font-bold">Next 7 days</CardTitle>
+            {(agenda?.overdueCount ?? 0) > 0 && (
+              <Badge variant="destructive">{agenda!.overdueCount} overdue</Badge>
+            )}
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/dashboard/agenda">View all</Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {agendaLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+            </div>
+          ) : (
+            <UpcomingAgenda
+              items={agenda?.items ?? []}
+              limit={5}
+              emptyMessage="Nothing due in the next 7 days."
+            />
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <Card className="relative">

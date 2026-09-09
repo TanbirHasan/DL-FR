@@ -279,6 +279,34 @@ export interface BillSummary {
   byStatus: Record<BillPaymentStatus, number>;
 }
 
+export type AgendaKind =
+  | "reminder"
+  | "bill"
+  | "recurring-expense"
+  | "job-deadline"
+  | "document"
+  | "health";
+
+export interface AgendaItem {
+  id: string;
+  kind: AgendaKind;
+  title: string;
+  subtitle: string | null;
+  date: string;
+  amount: number | null;
+  status: string | null;
+  href: string;
+  overdue: boolean;
+}
+
+export interface AgendaResponse {
+  days: number;
+  count: number;
+  overdueCount: number;
+  totalAmount: number;
+  items: AgendaItem[];
+}
+
 export interface CreateItemPayload {
   name: string;
   categoryId: string;
