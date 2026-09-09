@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BellRing, BookOpen, FileArchive, HeartPulse, Receipt, ShoppingCart, TrendingUp } from "lucide-react";
+import { BellRing, BookOpen, CalendarClock, FileArchive, HeartPulse, Receipt, ShoppingCart, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { NetSavingsCards } from "@/components/dashboard/net-savings-cards";
 import { useAuth } from "@/hooks/use-auth";
 import { useExpenseSummary } from "@/hooks/use-expenses";
+import { useBillSummary } from "@/hooks/use-bills";
 import { useReminders } from "@/hooks/use-reminders";
 import { useShoppingLists } from "@/hooks/use-shopping-lists";
 import { useDocuments } from "@/hooks/use-documents";
@@ -28,6 +29,10 @@ export default function DashboardPage() {
   const { data: journalEntries, isLoading: journalLoading } = useJournalEntries();
   const { data: healthReminders, isLoading: healthLoading } = useHealthReminders(false);
   const { data: documents, isLoading: documentsLoading } = useDocuments(true);
+  const { data: billSummary, isLoading: billSummaryLoading } = useBillSummary(
+    now.getFullYear(),
+    now.getMonth() + 1
+  );
 
   const upcomingReminders = reminders?.slice(0, 4) ?? [];
   const activeListsCount = lists?.length ?? 0;
@@ -77,6 +82,37 @@ export default function DashboardPage() {
             )}
             <Link href="/dashboard/expenses" className="text-xs font-medium text-primary underline-offset-4 hover:underline">
               View expenses
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between gap-3">
+              <CardTitle className="text-sm font-semibold text-muted-foreground">
+                Bills to pay
+              </CardTitle>
+              <span className="flex size-9 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <CalendarClock className="size-4" />
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {billSummaryLoading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              <p className="text-3xl font-bold">{formatCurrency(billSummary?.outstanding ?? 0)}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              {billSummary?.byStatus.OVERDUE
+                ? `${billSummary.byStatus.OVERDUE} overdue`
+                : "left this month"}
+            </p>
+            <Link
+              href="/dashboard/bills"
+              className="text-xs font-medium text-primary underline-offset-4 hover:underline"
+            >
+              View bills
             </Link>
           </CardContent>
         </Card>

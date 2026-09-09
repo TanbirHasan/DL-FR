@@ -211,6 +211,74 @@ export interface CreateShoppingListPayload {
   itemIds?: string[];
 }
 
+export type BillPaymentStatus = "UPCOMING" | "PAID" | "OVERDUE";
+
+export interface Bill {
+  id: string;
+  name: string;
+  amount: string | null;
+  isVariable: boolean;
+  dueDay: number;
+  notifyBefore: number;
+  isActive: boolean;
+  userId: string;
+  categoryId: string;
+  category?: Category;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BillPayment {
+  id: string;
+  billId: string;
+  userId: string;
+  month: number;
+  year: number;
+  dueDate: string;
+  status: BillPaymentStatus;
+  amountPaid: string | null;
+  paidAt: string | null;
+  notifiedAt: string | null;
+  expenseId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  bill: Bill;
+}
+
+export interface CreateBillPayload {
+  name: string;
+  amount?: number;
+  isVariable: boolean;
+  dueDay: number;
+  notifyBefore: number;
+  isActive?: boolean;
+  categoryId: string;
+}
+
+export type UpdateBillPayload = Partial<Omit<CreateBillPayload, "amount">> & {
+  amount?: number | null;
+};
+
+export interface MarkBillPaidPayload {
+  amountPaid: number;
+  paidDate?: string;
+}
+
+export interface BillPeriodQuery {
+  month?: number;
+  year?: number;
+}
+
+export interface BillSummary {
+  year: number;
+  month: number;
+  billed: number;
+  paid: number;
+  outstanding: number;
+  count: number;
+  byStatus: Record<BillPaymentStatus, number>;
+}
+
 export interface CreateItemPayload {
   name: string;
   categoryId: string;
