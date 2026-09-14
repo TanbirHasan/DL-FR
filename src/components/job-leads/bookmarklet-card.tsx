@@ -12,7 +12,10 @@ function buildBookmarklet(origin: string) {
   const captureUrl = `${origin}/dashboard/job-leads/capture`;
   // Kept as a single expression so it can't be broken by an accidental
   // semicolon-insertion issue when pasted as a bookmark URL.
-  const code = `(function(){var t=(window.getSelection?window.getSelection().toString():'').trim();if(!t){alert('Select the job post text first, then click this bookmarklet.');return;}if(t.length>${MAX_CAPTURE_CHARS})t=t.slice(0,${MAX_CAPTURE_CHARS});var u='${captureUrl}?text='+encodeURIComponent(t)+'&src='+encodeURIComponent(location.href);window.open(u,'_blank');})();`;
+  // Facebook post URLs carry long tracking query strings that serve no
+  // purpose here (it's just a "view original post" link) — strip them so the
+  // capture request stays small and clean.
+  const code = `(function(){var t=(window.getSelection?window.getSelection().toString():'').trim();if(!t){alert('Select the job post text first, then click this bookmarklet.');return;}if(t.length>${MAX_CAPTURE_CHARS})t=t.slice(0,${MAX_CAPTURE_CHARS});var s=location.href.split('?')[0].split('#')[0];if(s.length>1000)s=s.slice(0,1000);var u='${captureUrl}?text='+encodeURIComponent(t)+'&src='+encodeURIComponent(s);window.open(u,'_blank');})();`;
   return `javascript:${code}`;
 }
 
