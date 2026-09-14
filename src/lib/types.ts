@@ -581,6 +581,47 @@ export interface JobApplicationSummary {
   byStatus: Record<JobApplicationStatus, number>;
 }
 
+export type JobLeadStatus = "NEW" | "PROMOTED" | "DISMISSED" | "ARCHIVED";
+
+export type JobLeadRelevance = "high" | "medium" | "low";
+
+export interface JobLead {
+  id: string;
+  rawText: string;
+  sourceUrl: string | null;
+  isJobPost: boolean | null;
+  title: string | null;
+  companyName: string | null;
+  location: string | null;
+  deadline: string | null;
+  relevance: JobLeadRelevance | null;
+  summary: string | null;
+  processedAt: string | null;
+  processingError: string | null;
+  status: JobLeadStatus;
+  promotedApplicationId: string | null;
+  promotedApplication?: JobApplication | null;
+  capturedAt: string;
+  updatedAt: string;
+}
+
+export interface CaptureJobLeadPayload {
+  rawText: string;
+  sourceUrl?: string;
+}
+
+export interface PromoteJobLeadPayload {
+  companyName: string;
+  role: string;
+  jobUrl?: string;
+  deadline?: string | null;
+}
+
+export interface JobLeadSummary {
+  total: number;
+  byStatus: Record<JobLeadStatus, number>;
+}
+
 export type UpdateDocumentPayload = Partial<CreateDocumentPayload> & {
   identifier?: string | null;
   notes?: string | null;

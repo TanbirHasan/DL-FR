@@ -16,6 +16,7 @@ import {
   FileArchive,
   HeartPulse,
   Briefcase,
+  Inbox,
   LogOut,
 } from "lucide-react";
 import {
@@ -49,6 +50,7 @@ const NAV_ITEMS = [
   { href: "/dashboard/health", label: "Health", icon: HeartPulse },
   { href: "/dashboard/documents", label: "Documents Vault", icon: FileArchive },
   { href: "/dashboard/job-applications", label: "Job Applications", icon: Briefcase },
+  { href: "/dashboard/job-leads", label: "Job Leads", icon: Inbox },
 ];
 
 export function AppSidebar() {
