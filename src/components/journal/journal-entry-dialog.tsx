@@ -115,7 +115,7 @@ export function JournalEntryDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit journal entry" : "New journal entry"}</DialogTitle>
           <DialogDescription>Capture notes, events, thoughts, or important daily details.</DialogDescription>
@@ -156,7 +156,13 @@ export function JournalEntryDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="content">Notes</Label>
-            <Textarea id="content" rows={6} placeholder="What happened today?" {...register("content")} />
+            <Textarea
+              id="content"
+              rows={6}
+              placeholder="What happened today?"
+              className="max-h-64 overflow-y-auto"
+              {...register("content")}
+            />
             {errors.content && <p className="text-sm text-destructive">{errors.content.message}</p>}
           </div>
           <DialogFooter>
